@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mini-CEX – Turma</title>
+<style>
+:root{--bg:#f4f6fa;--card:#fff;--tx:#1b2430;--mut:#5d6b7c;--bd:#d5dce6;--pri:#2f5fa7;--priTx:#fff;--hd:#dfe8f5;--bad:#d9603b;--mid:#3b78c4;--good:#2e8b57;--err:#c0392b}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10151c;--card:#19202a;--tx:#e8edf3;--mut:#9aa8b8;--bd:#2c3745;--pri:#6b9fe6;--priTx:#10151c;--hd:#22334b;--bad:#e8825f;--mid:#6b9fe6;--good:#5cbf8a;--err:#ef7b6d}}
+:root[data-theme="dark"]{--bg:#10151c;--card:#19202a;--tx:#e8edf3;--mut:#9aa8b8;--bd:#2c3745;--pri:#6b9fe6;--priTx:#10151c;--hd:#22334b;--bad:#e8825f;--mid:#6b9fe6;--good:#5cbf8a;--err:#ef7b6d}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:720px;margin:0 auto;padding:12px 12px 40px}
+h1{font-size:1.25rem;margin:8px 0 2px}
+.sub{color:var(--mut);font-size:.875rem;margin:0 0 12px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;margin:12px 0;overflow:hidden}
+.card>h2{margin:0;padding:10px 14px;background:var(--hd);font-size:.95rem;letter-spacing:.02em}
+.in{padding:12px 14px}
+label.l,.l{display:block;font-weight:600;font-size:.9rem;margin:12px 0 6px}
+.in>.l:first-child{margin-top:0}
+input[type=text],input[type=date],input[type=number],textarea{width:100%;font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:10px}
+textarea{min-height:110px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:480px){.row{grid-template-columns:1fr}}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--bd);background:var(--bg);color:var(--tx);border-radius:999px;padding:9px 14px;font:inherit;font-size:.9rem;cursor:pointer;min-height:40px}
+.chip.on{background:var(--pri);color:var(--priTx);border-color:var(--pri);font-weight:600}
+.scale{display:none;margin-top:10px}
+.scale.show{display:block}
+.nums{display:grid;grid-template-columns:repeat(9,1fr);gap:4px}
+.num{border:2px solid var(--bd);background:var(--bg);color:var(--tx);border-radius:8px;font:inherit;font-weight:700;min-height:44px;cursor:pointer;padding:0}
+.num.b1{border-color:var(--bad)}.num.b2{border-color:var(--mid)}.num.b3{border-color:var(--good)}
+.num.on{background:var(--pri);color:var(--priTx);border-color:var(--pri)}
+.num.on.b1{background:var(--bad);color:#fff}.num.on.b2{background:var(--mid);color:#fff}.num.on.b3{background:var(--good);color:#fff}
+.bands{display:grid;grid-template-columns:3fr 3fr 3fr;font-size:.72rem;color:var(--mut);text-align:center;margin-top:4px}
+.bands span:nth-child(1){color:var(--bad)}.bands span:nth-child(2){color:var(--mid)}.bands span:nth-child(3){color:var(--good)}
+.dom{padding:12px 14px;border-top:1px solid var(--bd)}
+.dom:first-of-type{border-top:0}
+.dom .t{font-weight:700;margin-bottom:8px}
+.miss{outline:2px solid var(--err);outline-offset:3px;border-radius:8px}
+.err{color:var(--err);font-weight:600;margin:10px 0;display:none}
+.btn{font:inherit;font-weight:700;border:0;border-radius:10px;padding:13px 16px;cursor:pointer;background:var(--pri);color:var(--priTx);min-height:48px}
+.btn.sec{background:transparent;color:var(--pri);border:1px solid var(--pri)}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+.btns .btn{flex:1 1 150px}
+.sum{font-size:1.05rem;font-weight:700}
+.hist{font-size:.9rem}
+.hist div{padding:8px 0;border-top:1px solid var(--bd);display:flex;justify-content:space-between;gap:8px}
+.hist div:first-child{border-top:0}
+.mut{color:var(--mut);font-size:.85rem}
+#done{display:none}
+.hidden{display:none}
+select{width:100%;font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:10px}
+.tab{border:1px solid var(--bd);background:var(--bg);color:var(--tx);border-radius:999px;padding:9px 14px;font:inherit;font-size:.9rem;cursor:pointer;min-height:40px}
+.tab.on{background:var(--pri);color:var(--priTx);border-color:var(--pri);font-weight:600}
+.tab.add{border-style:dashed;color:var(--pri);background:transparent}
+</style>
+</head>
+<body>
+<main>
+<h1>Mini-CEX · Observação direta de consultas</h1>
+<p class="sub">Formulário preenchido pelo avaliador durante a prática clínica. Escala de nove pontos: Insatisfatório 1–3 · Satisfatório 4–6 · Superior 7–9. Os dados ficam salvos neste aparelho.</p>
+
+<div id="form">
+<section class="card"><h2>ALUNOS DESTA PRÁTICA</h2><div class="in"><div class="chips" id="tabs"></div><div class="mut" style="margin-top:8px">Cada aluno tem seu próprio rascunho. Toque no nome para alternar entre eles.</div></div></section>
+<section class="card"><h2>I · IDENTIFICAÇÃO</h2><div class="in">
+<div class="l">Avaliador (professor/tutor)</div>
+<input type="text" id="avaliador" placeholder="Nome completo" autocomplete="name">
+<div class="row"><div><div class="l">Aluno avaliado</div><select id="aluno"></select></div>
+<div><div class="l">RA / matrícula do aluno</div><input type="text" id="ra" placeholder="Automático" readonly></div></div>
+<div class="row"><div><div class="l">Local / unidade de atuação</div><input type="text" id="unidade" placeholder="Ex.: hospital, clínica, UBS"></div>
+<div><div class="l">Data</div><input type="date" id="data"></div></div>
+</div></section>
+
+<section class="card"><h2>II · DADOS DA CONSULTA</h2><div class="in">
+<div class="l">Queixa principal ou problema de saúde</div>
+<textarea id="queixa" style="min-height:70px"></textarea>
+<div class="l" data-g="local">Local da consulta</div>
+<div class="chips" data-chips="local" data-opts="Ambulatório|Enfermaria|Emergência|Outros"></div>
+<div class="row"><div><div class="l">Idade do paciente</div><input type="text" id="idade" inputmode="numeric" placeholder="Somente números"></div>
+<div><div class="l" data-g="sexo">Sexo do paciente</div><div class="chips" data-chips="sexo" data-opts="Feminino|Masculino|Outro"></div>
+<input type="text" id="sexoOutro" class="hidden" placeholder="Descreva" style="margin-top:8px"></div></div>
+<div class="l" data-g="tipo">Tipo de consulta</div>
+<div class="chips" data-chips="tipo" data-opts="Primeira consulta|Retorno"></div>
+<div class="l" data-g="complexidade">Complexidade</div>
+<div class="chips" data-chips="complexidade" data-opts="Baixa|Moderada|Alta"></div>
+<div class="l" data-g="foco">Foco da consulta</div>
+<div class="chips" data-chips="foco" data-opts="Coleta de dados|Diagnóstico|Tratamento|Aconselhamento"></div>
+</div></section>
+
+<section class="card"><h2>III · ESCALAS AVALIATIVAS</h2><div id="doms"></div></section>
+
+<section class="card"><h2>IV · TEMPO E SATISFAÇÃO</h2><div class="in">
+<div class="row"><div><div class="l">Duração da consulta (minutos)</div><input type="text" id="tConsulta" inputmode="numeric" placeholder="Ex.: 20"></div>
+<div><div class="l">Duração da devolutiva (minutos)</div><input type="text" id="tDevolutiva" inputmode="numeric" placeholder="Ex.: 10"></div></div>
+<div class="l">Satisfação do avaliador com o Mini-CEX</div><div class="nums" data-satbox="satAval"></div><div class="mut" style="display:flex;justify-content:space-between"><span>Baixo</span><span>Alto</span></div>
+<div class="l">Satisfação do aluno com o Mini-CEX</div><div class="nums" data-satbox="satAluno"></div><div class="mut" style="display:flex;justify-content:space-between"><span>Baixo</span><span>Alto</span></div>
+</div></section>
+
+<section class="card"><h2>V · COMENTÁRIO</h2><div class="in">
+<div class="l">Orientações para o aluno melhorar o desempenho futuro</div>
+<textarea id="comentario" maxlength="6000" style="min-height:140px"></textarea>
+<div class="mut"><span id="cnt">0</span> / 6000 caracteres</div>
+</div></section>
+
+<div class="card"><div class="in">
+<div class="l" style="margin-top:0">Resumo parcial</div>
+<div class="sum" id="resumo">Sem notas ainda</div>
+<div class="err" id="err"></div>
+<div class="btns" style="margin-top:12px"><button class="btn" id="salvar">Salvar avaliação</button><button class="btn sec" id="limpar">Limpar formulário</button></div>
+</div></div>
+</div>
+
+<div id="done"><section class="card"><h2>AVALIAÇÃO SALVA</h2><div class="in">
+<div class="sum" id="doneTxt"></div>
+<div class="btns" style="margin-top:12px"><button class="btn" id="bCsv">Baixar esta (CSV)</button><a class="btn" id="bMail" href="#" style="text-decoration:none;text-align:center;display:block">Enviar por e-mail</a><button class="btn sec" id="bCopy">Copiar resumo</button><button class="btn" id="bNova">Avaliar outro aluno</button></div>
+<div class="mut" id="msg" style="margin-top:8px"></div>
+</div></section></div>
+
+<section class="card" id="histCard"><h2>AVALIAÇÕES SALVAS NESTE APARELHO</h2><div class="in">
+<div class="hist" id="hist"></div>
+<div class="btns" style="margin-top:10px"><button class="btn sec" id="bAll">Baixar todas (CSV)</button></div>
+<div class="mut" id="msg2" style="margin-top:8px"></div>
+<div class="mut" style="margin-top:8px">O histórico fica apenas neste navegador. Baixe o CSV para guardar ou enviar à coordenação.</div>
+</div></section>
+</main>
+
+<script>
+var DOMS=[["entrevista","Entrevista médica / anamnese"],["exame","Exame físico"],["human","Qualidades humanísticas / profissionalismo"],["raciocinio","Raciocínio clínico"],["orientacao","Orientação (aconselhamento)"],["organizacao","Organização / eficiência"],["geral","Competência clínica geral"]];
+var CHIPS=["local","sexo","tipo","complexidade","foco"];
+var TXT=["avaliador","aluno","ra","unidade","data","queixa","idade","sexoOutro","tConsulta","tDevolutiva","comentario"];
+var s={},hist=[],last=null,drafts=[],cur=0,rmArm=null;
+var $=function(i){return document.getElementById(i)};
+function ls(k,v){try{if(v===undefined){var r=localStorage.getItem(k);return r?JSON.parse(r):null}localStorage.setItem(k,JSON.stringify(v))}catch(e){return null}}
+function band(n){return n<=3?1:n<=6?2:3}
+function bandName(n){return["","Insatisfatório","Satisfatório","Superior"][band(n)]}
+function iso2br(d){return d&&d.indexOf("-")>0?d.split("-").reverse().join("/"):d||""}
+
+// build chips
+document.querySelectorAll("[data-chips]").forEach(function(box){var n=box.dataset.chips;box.dataset.n=n;box.dataset.g=n;
+ box.dataset.opts.split("|").forEach(function(o){var b=document.createElement("button");b.type="button";b.className="chip";b.textContent=o;b.dataset.n=n;b.dataset.v=o;box.appendChild(b)})});
+// build domains
+var dh="";DOMS.forEach(function(d){var k=d[0];dh+='<div class="dom" id="dom_'+k+'"><div class="t">'+d[1]+'</div><div class="chips"><button type="button" class="chip" data-n="obs_'+k+'" data-v="Observado">Observado</button><button type="button" class="chip" data-n="obs_'+k+'" data-v="Não observado">Não observado</button></div><div class="scale" id="sc_'+k+'"><div class="nums" data-sc="'+k+'"></div><div class="bands"><span>Insatisfatório</span><span>Satisfatório</span><span>Superior</span></div></div></div>'});
+$("doms").innerHTML=dh;
+function nums(box,key,isSat){for(var i=1;i<=9;i++){var b=document.createElement("button");b.type="button";b.className="num "+(isSat?"":"b"+band(i));b.textContent=i;b.dataset.k=key;b.dataset.v=i;b.dataset.sat=isSat?1:0;box.appendChild(b)}}
+document.querySelectorAll("[data-sc]").forEach(function(b){nums(b,b.dataset.sc,false)});
+document.querySelectorAll("[data-satbox]").forEach(function(b){nums(b,b.dataset.satbox,true)});
+
+function paint(){
+ document.querySelectorAll(".chip").forEach(function(c){c.classList.toggle("on",s[c.dataset.n]===c.dataset.v)});
+ document.querySelectorAll(".num").forEach(function(c){c.classList.toggle("on",String(s[c.dataset.sat==="1"?c.dataset.k:"n_"+c.dataset.k])===c.dataset.v)});
+ DOMS.forEach(function(d){$("sc_"+d[0]).classList.toggle("show",s["obs_"+d[0]]==="Observado")});
+ $("sexoOutro").classList.toggle("hidden",s.sexo!=="Outro");
+ $("cnt").textContent=($("comentario").value||"").length;
+ var v=[];DOMS.forEach(function(d){if(s["obs_"+d[0]]==="Observado"&&s["n_"+d[0]])v.push(+s["n_"+d[0]])});
+ if(v.length){var m=v.reduce(function(a,b){return a+b},0)/v.length;$("resumo").textContent="Média das notas observadas: "+m.toFixed(1).replace(".",",")+" ("+bandName(Math.round(m))+") · "+v.length+" de "+DOMS.length+" domínios"}else $("resumo").textContent="Sem notas ainda";
+}
+function persist(){drafts[cur]=s;ls("minicex_drafts",{list:drafts,cur:cur});renderTabs()}
+document.addEventListener("click",function(e){var t=e.target.closest("button");if(!t)return;
+ if(t.classList.contains("chip")){s[t.dataset.n]=t.dataset.v;if(t.dataset.n.indexOf("obs_")===0&&t.dataset.v!=="Observado")delete s["n_"+t.dataset.n.slice(4)];t.closest(".miss")&&t.closest(".miss").classList.remove("miss");paint();persist()}
+ else if(t.classList.contains("num")){var k=t.dataset.k;if(t.dataset.sat==="1")s[k]=+t.dataset.v;else s["n_"+k]=+t.dataset.v;paint();persist()}
+});
+TXT.forEach(function(id){$(id).addEventListener("input",function(){s[id]=$(id).value;paint();persist()})});
+
+function load(d){s=d||{};drafts[cur]=s;TXT.forEach(function(id){$(id).value=s[id]||""});if(!s.data)s.data=new Date().toISOString().slice(0,10);$("data").value=s.data;paint()}
+function reset(keep){var k={};if(keep){k.avaliador=s.avaliador;k.unidade=s.unidade}k.data=new Date().toISOString().slice(0,10);load(k);persist();scrollTo(0,0)}
+
+var STUDENTS=[["245070", "ANA BEATRIZ DURIGAN DE MOURA"], ["245016", "ANGELA CAROLINE AGOSTINELLI EPAMINONDAS"], ["245006", "BIANCA SILVESTRINI ALEIXO"], ["245073", "DANIEL GOIS VENDEMIATTI"], ["245003", "DIEGO PERES RECALDE"], ["236119", "EBONY VITORIA TENAN SOTERO"], ["245023", "EDUARDO KAZUTO TANIGAWA"], ["245011", "GABRIEL HENRIQUE CAVALHEIRO"], ["245039", "GUILHERME ALVES NOGUEIRA"], ["245013", "ISABELA SANTOS DE SOUZA"], ["245035", "JOAO VICTOR DOMINGUES E SILVA VITORINO"], ["245024", "LARA LOPES CRESPO"], ["245017", "LUCAS YUNZHI PESSATO HAN"], ["245026", "MARIANA SABATINO GIAMARINO ABUKATER"], ["245037", "MATEUS VINICIUS VIEIRA BAGATIN"], ["245019", "PAOLLA GOROI RUGGIERI OLIVEIRA"], ["245036", "PEDRO AUGUSTO BADDINI MACHADO"], ["245012", "SOPHIA LAURA SILVA STOIANOFF"], ["245072", "TATHIELY SANTOS DA SILVA"], ["245038", "YASMIN SAYURI MARTINES"]];
+function buildAlunos(){var done={};hist.forEach(function(r){if(r.ra)done[r.ra]=1});var c=s.aluno||"",sel=$("aluno");sel.innerHTML="";var o=document.createElement("option");o.value="";o.textContent="Selecione o aluno";sel.appendChild(o);STUDENTS.forEach(function(a){var p=document.createElement("option");p.value=a[1];p.textContent=(done[a[0]]?"\u2713 ":"")+a[1]+" \u2013 "+a[0];sel.appendChild(p)});sel.value=c}
+$("aluno").addEventListener("change",function(){var v=$("aluno").value,m=STUDENTS.filter(function(x){return x[1]===v})[0];s.aluno=v;s.ra=m?m[0]:"";$("ra").value=s.ra;paint();persist()});
+function renderTabs(){var t=$("tabs");t.innerHTML="";drafts.forEach(function(d,i){var b=document.createElement("button");b.type="button";b.className="tab"+(i===cur?" on":"");b.dataset.tab=i;b.textContent=((d.aluno||"").trim())||"Aluno "+(i+1);t.appendChild(b)});var a=document.createElement("button");a.type="button";a.className="tab add";a.dataset.add="1";a.textContent="+ Adicionar aluno";t.appendChild(a);if(drafts.length>1){var r=document.createElement("button");r.type="button";r.className="tab add";r.dataset.rm="1";r.textContent="Remover aluno atual";t.appendChild(r)}}
+function newDraft(b){var d={data:new Date().toISOString().slice(0,10)};if(b){d.avaliador=b.avaliador;d.unidade=b.unidade;d.data=b.data||d.data}return d}
+function switchTo(i){cur=i;load(drafts[i]);persist();scrollTo(0,0)}
+function addStudent(){drafts.push(newDraft(drafts[cur]));cur=drafts.length-1;load(drafts[cur]);persist();scrollTo(0,0)}
+function removeCurrent(){drafts.splice(cur,1);if(!drafts.length)drafts.push(newDraft());cur=Math.min(cur,drafts.length-1);load(drafts[cur]);persist()}
+$("tabs").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;if(b.dataset.tab!==undefined)switchTo(+b.dataset.tab);else if(b.dataset.add)addStudent();else if(b.dataset.rm){if(!rmArm){b.textContent="Toque de novo para remover";rmArm=setTimeout(function(){rmArm=null;renderTabs()},3000);return}clearTimeout(rmArm);rmArm=null;removeCurrent()}});
+function validate(){var miss=[],el=[];
+ ["avaliador","aluno","data","queixa","idade","comentario"].forEach(function(id){if(!(s[id]||"").trim()){miss.push(id);el.push($(id))}});
+ CHIPS.forEach(function(n){if(!s[n]){miss.push(n);el.push(document.querySelector('[data-g="'+n+'"]'))}});
+ if(s.sexo==="Outro"&&!(s.sexoOutro||"").trim()){miss.push("sexoOutro");el.push($("sexoOutro"))}
+ DOMS.forEach(function(d){var k=d[0];if(!s["obs_"+k]||(s["obs_"+k]==="Observado"&&!s["n_"+k])){miss.push(k);el.push($("dom_"+k))}});
+ return{miss:miss,el:el}}
+function esc(v){v=v==null?"":String(v);return/[;"\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
+var COLS=[["Data","dataBr"],["Avaliador","avaliador"],["Aluno","aluno"],["RA","ra"],["Unidade","unidade"],["Queixa principal","queixa"],["Local da consulta","local"],["Idade do paciente","idade"],["Sexo do paciente","sexoTxt"],["Tipo de consulta","tipo"],["Complexidade","complexidade"],["Foco","foco"]];
+DOMS.forEach(function(d){COLS.push([d[1]+" (obs.)","obs_"+d[0]]);COLS.push([d[1]+" (nota)","n_"+d[0]])});
+COLS.push(["Média","media"],["Duração da consulta","tConsulta"],["Duração da devolutiva","tDevolutiva"],["Satisfação avaliador","satAval"],["Satisfação aluno","satAluno"],["Comentário","comentario"]);
+function rec(r){var v=[];DOMS.forEach(function(d){if(r["obs_"+d[0]]==="Observado"&&r["n_"+d[0]])v.push(+r["n_"+d[0]])});
+ r.media=v.length?(v.reduce(function(a,b){return a+b},0)/v.length).toFixed(1).replace(".",","):"";r.dataBr=iso2br(r.data);r.sexoTxt=r.sexo==="Outro"?"Outro: "+(r.sexoOutro||""):r.sexo;return r}
+function csv(list){var out=[COLS.map(function(c){return esc(c[0])}).join(";")];list.forEach(function(r){r=rec(Object.assign({},r));out.push(COLS.map(function(c){return esc(r[c[1]])}).join(";"))});return"\ufeff"+out.join("\r\n")}
+function setMsg(m){$("msg").textContent=m;$("msg2").textContent=m}
+function save(name,text){if(typeof claude==="undefined"||!claude.use){try{var bl=new Blob([text],{type:"text/csv;charset=utf-8"}),u=URL.createObjectURL(bl),a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setMsg("Arquivo baixado.")}catch(e){setMsg("Não foi possível baixar. Use Copiar resumo.")}return Promise.resolve()}return claude.use("downloads").then(function(d){if(!d){setMsg("Download indisponível aqui. Use Copiar resumo.");return}
+ return d.save({filename:name,data:text}).then(function(){setMsg("Arquivo salvo.")}).catch(function(e){if(e&&e.code==="declined")return;setMsg("Não foi possível baixar. Use Copiar resumo.")})}).catch(function(){setMsg("Download indisponível aqui.")})}
+function summary(r){r=rec(Object.assign({},r));var t="MINI-CEX · "+r.dataBr+"\nAluno: "+r.aluno+(r.ra?" ("+r.ra+")":"")+"\nAvaliador: "+r.avaliador+"\nLocal: "+(r.unidade||"-")+"\nQueixa: "+r.queixa+"\nPaciente: "+r.idade+", "+r.sexoTxt+"\nConsulta: "+r.local+", "+r.tipo+", complexidade "+r.complexidade+", foco "+r.foco+"\n\n";
+ DOMS.forEach(function(d){t+=d[1]+": "+(r["obs_"+d[0]]==="Observado"?r["n_"+d[0]]+" ("+bandName(r["n_"+d[0]])+")":"não observado")+"\n"});
+ return t+"\nMédia: "+(r.media||"-")+"\nDuração consulta: "+(r.tConsulta||"-")+" · devolutiva: "+(r.tDevolutiva||"-")+"\nSatisfação avaliador: "+(r.satAval||"-")+" · aluno: "+(r.satAluno||"-")+"\n\nComentário:\n"+r.comentario}
+function copy(t){var ok=false;try{var a=document.createElement("textarea");a.value=t;a.style.position="fixed";a.style.opacity="0";document.body.appendChild(a);a.select();ok=document.execCommand("copy");a.remove()}catch(e){}
+ if(!ok&&navigator.clipboard){return navigator.clipboard.writeText(t).then(function(){$("msg").textContent="Resumo copiado."},function(){$("msg").textContent="Não foi possível copiar."})}
+ $("msg").textContent=ok?"Resumo copiado.":"Não foi possível copiar."}
+function fname(r){return"mini-cex_"+(r.aluno||"aluno").replace(/[^\wÀ-ÿ]+/g,"-")+"_"+(r.data||"")+".csv"}
+function renderHist(){buildAlunos();var h=$("hist");h.innerHTML="";if(!hist.length){h.innerHTML='<span class="mut">Nenhuma avaliação salva ainda.</span>';$("bAll").style.display="none";return}
+ $("bAll").style.display="";hist.slice().reverse().forEach(function(r){var x=rec(Object.assign({},r));var d=document.createElement("div");d.innerHTML="<span></span><span class='mut'></span>";d.children[0].textContent=x.aluno;d.children[1].textContent=x.dataBr+(x.media?" · média "+x.media:"");h.appendChild(d)})}
+
+$("salvar").onclick=function(){var v=validate(),e=$("err");document.querySelectorAll(".miss").forEach(function(n){n.classList.remove("miss")});
+ if(v.miss.length){v.el.forEach(function(n){n&&n.classList.add("miss")});e.style.display="block";e.textContent="Faltam "+v.miss.length+" item(ns) obrigatório(s), marcados em vermelho.";v.el[0]&&v.el[0].scrollIntoView({behavior:"smooth",block:"center"});return}
+ e.style.display="none";last=Object.assign({},s,{id:Date.now()});hist.push(last);ls("minicex_hist",hist);
+ var x=rec(Object.assign({},last));$("doneTxt").textContent=x.aluno+" · média "+(x.media||"-")+" ("+x.dataBr+")";$("msg").textContent="";
+ $("form").style.display="none";$("done").style.display="block";renderHist();scrollTo(0,0)};
+var lt=null;$("limpar").onclick=function(){var b=$("limpar");if(!lt){b.textContent="Toque de novo para confirmar";lt=setTimeout(function(){b.textContent="Limpar formulário";lt=null},3000);return}clearTimeout(lt);lt=null;b.textContent="Limpar formulário";reset(true)};
+$("bNova").onclick=function(){var base=drafts[cur];drafts.splice(cur,1);if(!drafts.length)drafts.push(newDraft(base));cur=Math.min(cur,drafts.length-1);$("done").style.display="none";$("form").style.display="block";load(drafts[cur]);persist();scrollTo(0,0)};
+$("bCsv").onclick=function(){save(fname(last),csv([last]))};
+$("bCopy").onclick=function(){copy(summary(last))};
+$("bMail").onclick=function(){var r=rec(Object.assign({},last));$("bMail").href="mailto:sandra.lopes@facens.br?cc=sandrabizarriavillanueva@gmail.com&subject="+encodeURIComponent("Mini-CEX – "+r.aluno+" – "+r.dataBr)+"&body="+encodeURIComponent(summary(last));setMsg("Se o aplicativo de e-mail não abriu, toque em Copiar resumo e cole em um e-mail.")};
+$("bAll").onclick=function(){setMsg("");save("mini-cex_todas.csv",csv(hist))};
+
+hist=ls("minicex_hist")||[];var sv=ls("minicex_drafts");if(sv&&sv.list&&sv.list.length){drafts=sv.list;cur=Math.min(sv.cur||0,drafts.length-1)}else{drafts=[ls("minicex_draft")||{}];cur=0}load(drafts[cur]);renderTabs();renderHist();
+</script>
+</body>
+</html>
